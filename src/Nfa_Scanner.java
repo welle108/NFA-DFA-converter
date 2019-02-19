@@ -1,11 +1,13 @@
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/* Public class for Scanning .nfa files and delivering the NFA schema to
-an Nfa_Converter object in the form of ArrayList<String>'s and Strings.
- */
+    /*
+    Public class for Scanning .nfa files and delivering the NFA schema to
+    an Nfa_Converter object in the form of ArrayList<String>'s and Strings.
+     */
 
 public class Nfa_Scanner {
     String filename;
@@ -19,56 +21,62 @@ public class Nfa_Scanner {
     public Nfa_Scanner(String filename)
     {
             this.states = new ArrayList<String>();
-            this.symbols = new ArrayList<String>();
+            this.symbols = null;
             this.accept_states = new ArrayList<String>();
             this.trans_function = new ArrayList<String>();
             this.start_state = null;
             this.filename = filename;
     }
 
-    //Scans file and properly formats data
+    /*
+    Reads .nfa file and parses data. Pattern p uses regex to search for data group between curly braces to extract
+    data from lines where necessary. Data is then passed to Converter object constructor where it is assembled into
+    State objects
+     */
+
     public void Scan()
     {
         try {
             File nfaSchema = new File(filename);
             BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(nfaSchema)));
-
-
-            /*File dfaSchema = new File("output.dfa");
-            if(! dfaSchema.exists()) {
-                dfaSchema.createNewFile();
-            }
-            PrintWriter pw = new PrintWriter(dfaSchema);
-            */
-
             String line;
             Pattern p = Pattern.compile("\\{([^}]*)\\}");
+            Matcher m;
 
             //Get states
             line = in.readLine();
-            Matcher m = p.matcher(line);
+            m = p.matcher(line);
             while (m.find()) {
                 states.add(m.group(1));
             }
 
-            //Get symbols
+            // Get symbols
             line = in.readLine();
+            symbols = new ArrayList<String>(Arrays.asList(line.split("\\s+")));
 
-            // Start state
+            // Get start state
+            line = in.readLine();
+            m = p.matcher(line);
+            if(m.find())
+            {
+                start_state = m.group(1);
+            }
 
             //Get accept states
+            line = in.readLine();
+            m = p.matcher(line);
+            while (m.find()) {
+                accept_states.add(m.group(1));
+            }
 
             // Read transition function
             while((line = in.readLine()) != null)
             {
-
-
+                trans_function.add(line);
                 //pw.println(line);
 
             }
-            //pw.close();
             in.close();
-
 
         }catch (IOException e){
             System.out.println("Error opening file");
@@ -76,10 +84,6 @@ public class Nfa_Scanner {
             System.exit(1);
         }
 
-        System.out.println("File closed. Printing contents of 'states: '");
-        for( String i : states){
-            System.out.println(i);
-        }
     }
 
     public ArrayList<String> getStates(){
