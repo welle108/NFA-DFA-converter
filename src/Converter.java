@@ -1,12 +1,13 @@
 import java.util.ArrayList;
+import java.util.Hashtable;
 
 // Public class which constructs FA states from Nfa_Scanner object and converts to DFA
 public class Converter {
-    ArrayList<String> input_states;
-    ArrayList<String> input_symbols;
-    String input_start_state;
-    ArrayList<String> input_accept_states;
-    ArrayList<String> input_trans_function;
+    private ArrayList<String> input_states;
+    private ArrayList<String> input_symbols;
+    private String input_start_state;
+    private ArrayList<String> input_accept_states;
+    private ArrayList<String> input_trans_function;
 
     public Converter(ArrayList<String> states, ArrayList<String> symbols, String start_State, ArrayList<String> accept_States, ArrayList<String> trans_Function){
         this.input_states = new ArrayList<>(states);
@@ -42,6 +43,8 @@ public class Converter {
         for( String i : input_trans_function){
             System.out.println(i);
         }
+
+        Hashtable<ArrayList<String>, ArrayList<String>> statesofwayne;
 
 
 

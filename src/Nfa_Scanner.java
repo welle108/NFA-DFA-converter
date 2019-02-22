@@ -10,12 +10,12 @@ import java.util.regex.Pattern;
      */
 
 public class Nfa_Scanner {
-    String filename;
-    ArrayList<String> states;
-    ArrayList<String> symbols;
-    String start_state;
-    ArrayList<String> accept_states;
-    ArrayList<String> trans_function;
+    private String filename;
+    private ArrayList<String> states;
+    private ArrayList<String> symbols;
+    private String start_state;
+    private ArrayList<String> accept_states;
+    private ArrayList<String> trans_function;
 
     //Initializes object variables
     public Nfa_Scanner(String filename)
