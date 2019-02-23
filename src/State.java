@@ -1,6 +1,7 @@
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Hashtable;
+import java.util.Set;
 
 public class State {
 
@@ -21,8 +22,30 @@ public class State {
         return name;
     }
 
+
     public HashSet<String> getEPSvalues()
     {
         return transition_function.get("EPS");
+    }
+
+    public String stringOfName(){
+        String nameString = "{" + name.toString().substring(1, name.size()-1) + "}";
+        return nameString;
+    }
+
+    public String stringOfTransition(){
+        Set<String> keys = transition_function.keySet();
+        StringBuffer s = new StringBuffer();
+
+
+        for(String key : keys){
+            s.append(this.stringOfName());
+            s.append(", " + key + " = ");
+            HashSet<String> nextState = transition_function.get(key);
+            s.append('{'+ nextState.toString().substring(1, nextState.size()-1)
+                    + "}\n");
+        }
+
+        return s.toString();
     }
 }

@@ -1,3 +1,4 @@
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -70,16 +71,42 @@ public class DFA {
         return (success && success2);
     }
 
-    public void printDFA() throws IOException {
+    public void writeDFA() throws IOException {
         String filename = "%s.dfa";
         filename = String.format(filename, this.name);
-        FileWriter fw = new FileWriter(filename);
 
         StringBuffer s = new StringBuffer();
 
         for (State state: this.states) {
-            for(String a : state.)
+            s.append(state.stringOfName() + '\t');
         }
 
+        s.append('\n');
+
+        for(String l : this.language){
+            s.append(l + '\t');
+        }
+
+        s.append('\n');
+
+        s.append(startState.stringOfName() + '\n');
+
+        for(State state : acceptStates){
+            s.append(state.stringOfName() + '\t');
+        }
+
+        s.append('\n');
+
+        for(State state : this.states){
+            s.append(state.stringOfTransition());
+        }
+
+        BufferedWriter bwr = new BufferedWriter(
+                new FileWriter(new File(filename)));
+
+        bwr.write(s.toString());
+        bwr.flush();
+        bwr.close();
+        System.out.println("DFA Written");
     }
 }
