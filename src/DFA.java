@@ -1,13 +1,17 @@
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 
 public class DFA {
+    private String name;
     private State startState;
     private HashSet<State> acceptStates;
     private HashSet<String> language;
     private HashSet<State> states;
 
-    public DFA(State startState, HashSet<String> language){
+    public DFA(String name, State startState, HashSet<String> language){
         this.startState = startState;
         this.language = language;
         this.acceptStates = new HashSet<State>();
@@ -66,7 +70,16 @@ public class DFA {
         return (success && success2);
     }
 
-    public void printDFA(){
+    public void printDFA() throws IOException {
+        String filename = "%s.dfa";
+        filename = String.format(filename, this.name);
+        FileWriter fw = new FileWriter(filename);
+
+        StringBuffer s = new StringBuffer();
+
+        for (State state: this.states) {
+            for(String a : state.)
+        }
 
     }
 }
