@@ -1,34 +1,28 @@
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Hashtable;
 
 public class State {
 
     private HashSet<String> name;
-    private ArrayList<Transition> transitionFunction;
+    private Hashtable<String, HashSet<String>> transition_function;
 
     public State(HashSet<String> name){
-        this.name = name;
-        this.transitionFunction = new ArrayList<Transition>();
+        this.name = new HashSet<String>(name);
+        this.transition_function = new Hashtable<String, HashSet<String>>();
     }
 
-    //returns true if successful;
     public void addTransition(String input, HashSet<String> nextState)
     {
-        Transition t = new Transition(input, nextState);
-        transitionFunction.add(t);
-    }
-
-    public void setName(HashSet<String> name) {
-        this.name = name;
+        transition_function.put(input, nextState);
     }
 
     public HashSet<String> getName() {
         return name;
     }
 
-    public ArrayList<Transition> getTransitionFunction() {
-        return transitionFunction;
+    public HashSet<String> getEPSvalues()
+    {
+        return transition_function.get("EPS");
     }
 }

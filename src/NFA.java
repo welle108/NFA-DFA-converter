@@ -1,22 +1,39 @@
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Hashtable;
 
 public class NFA {
-    private ArrayList<String> input_states;
-    private ArrayList<String> input_symbols;
+    private Hashtable<String, State> input_states;
+    private HashSet<String> input_symbols;
     private String input_start_state;
-    private ArrayList<String> input_accept_states;
-    private ArrayList<String> input_trans_function;
+    private HashSet<String> input_accept_states;
+    private HashSet<String> input_trans_function;
 
-    public NFA(ArrayList<String> states, ArrayList<String> symbols, String start_State, ArrayList<String> accept_States, ArrayList<String> trans_Function) {
-        this.input_states = new ArrayList<>(states);
-        this.input_symbols = new ArrayList<>(symbols);
+    public NFA(Hashtable<String, State> states, HashSet<String> symbols, String start_State, HashSet<String> accept_States, HashSet<String> trans_Function) {
+        this.input_states = new Hashtable(states);
+        this.input_symbols = new HashSet<>(symbols);
         this.input_start_state = start_State;
-        this.input_accept_states = new ArrayList<>(accept_States);
-        this.input_trans_function = new ArrayList<>(trans_Function);
+        this.input_accept_states = new HashSet<>(accept_States);
+        this.input_trans_function = new HashSet<>(trans_Function);
     }
+
+
+    public HashSet<String> epsilonClosure(State inputState) {
+        HashSet<String> outputClosure = new HashSet<String>(inputState.getName());
+        HashSet<String> epsTransitions = new HashSet<String>(inputState.getEPSvalues());
+
+        while(!outputClosure.equals(epsTransitions)){
+            for(String i : epsTransitions){
+                epsTransitions.addAll(input_states.get(i).getEPSvalues());
+            }
+            outputClosure.addAll(epsTransitions);
+        }
+
+        return outputClosure;
+
+    }
+
 }
-
-
 /*
     TODO: Insert .dfa output code
 
