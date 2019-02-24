@@ -11,7 +11,15 @@ public class DFA {
     private HashSet<String> language;
     private HashSet<State> states;
 
-    public DFA(String name, State startState, HashSet<String> language){
+
+    public DFA() {
+        this.startState = null;
+        this.language = null;
+        this.acceptStates = null;
+        this.states = null;
+    }
+
+    public DFA(String name, State startState, HashSet<String> language) {
         this.startState = startState;
         this.language = language;
         this.acceptStates = new HashSet<State>();
@@ -43,7 +51,7 @@ public class DFA {
         this.language = language;
     }
 
-    public boolean addLanguage(String lang){
+    public boolean addLanguage(String lang) {
         boolean success = this.language.add(lang);
         return success;
     }
@@ -56,16 +64,16 @@ public class DFA {
         return states;
     }
 
-    public boolean addStates(State newState){
+    public boolean addStates(State newState) {
         boolean success = this.states.add(newState);
         return success;
     }
 
-    public boolean addStates(State newState, boolean accept){
+    public boolean addStates(State newState, boolean accept) {
         boolean success = this.states.add(newState);
         boolean success2 = true;
-        if(accept == true){
-             success2 = this.acceptStates.add(newState);
+        if (accept == true) {
+            success2 = this.acceptStates.add(newState);
         }
         return (success && success2);
     }
@@ -76,10 +84,11 @@ public class DFA {
         FileWriter fw = new FileWriter(filename);
 
         StringBuffer s = new StringBuffer();
-
+/*
         for (State state: this.states) {
             for(String a : state.)
         }
 
+    }*/
     }
 }

@@ -1,6 +1,8 @@
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Hashtable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -11,19 +13,22 @@ import java.util.regex.Pattern;
 
 public class Nfa_Scanner {
     private String filename;
-    private ArrayList<String> states;
-    private ArrayList<String> symbols;
+    private HashSet<String> states;
+    private HashSet<String> symbols;
     private String start_state;
-    private ArrayList<String> accept_states;
-    private ArrayList<String> trans_function;
+    private HashSet<String> accept_states;
+    private HashSet<String> trans_function;
+    private Hashtable<String, State> nfaStateTable;
+
 
     //Initializes object variables
     public Nfa_Scanner(String filename)
     {
-            this.states = new ArrayList<String>();
-            this.symbols = null;
-            this.accept_states = new ArrayList<String>();
-            this.trans_function = new ArrayList<String>();
+            this.nfaStateTable = new Hashtable<>();
+            this.states = new HashSet<String>();
+            this.symbols = new HashSet<>();
+            this.accept_states = new HashSet<>();
+            this.trans_function = new HashSet<>();
             this.start_state = null;
             this.filename = filename;
     }
@@ -52,7 +57,7 @@ public class Nfa_Scanner {
 
             // Get symbols
             line = in.readLine();
-            symbols = new ArrayList<String>(Arrays.asList(line.split("\\s+")));
+            symbols = new HashSet<String>(Arrays.asList(line.split("\\s+")));
 
             // Get start state
             line = in.readLine();
@@ -86,19 +91,54 @@ public class Nfa_Scanner {
 
     }
 
-    public ArrayList<String> getStates(){
+    public void printAll()
+    {
+        System.out.println("NFA schema: ");
+        System.out.println("---------------------------------------");
+        System.out.println("States: ");
+        for(String i : states)
+        {
+            System.out.print(i);
+        }
+        System.out.print("\n");
+        System.out.println("Symbols: ");
+        for(String i : symbols)
+        {
+            System.out.print(i);
+        }
+        System.out.print("\n");
+        System.out.println("Start State: ");
+        System.out.println(start_state);
+        System.out.println("Accept States: ");
+        for(String i : accept_states)
+        {
+            System.out.print(i);
+        }
+        System.out.print("\n");
+
+        System.out.println("Transition Function: ");
+        for(String i : trans_function)
+        {
+            System.out.println(i);
+        }
+        System.out.print("\n");
+        System.out.println("---------------------------------------");
+
+    }
+
+    public HashSet<String> getStates(){
         return states;
     }
 
-    public ArrayList<String> getAccept_states() {
+    public HashSet<String> getAccept_states() {
         return accept_states;
     }
 
-    public ArrayList<String> getSymbols() {
+    public HashSet<String> getSymbols() {
         return symbols;
     }
 
-    public ArrayList<String> getTrans_function() {
+    public HashSet<String> getTrans_function() {
         return trans_function;
     }
 
