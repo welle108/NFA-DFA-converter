@@ -34,14 +34,3 @@ public class NFA {
     }
 
 }
-/*
-    TODO: Insert .dfa output code
-
-    File dfaSchema = new File("output.dfa");
-            if(! dfaSchema.exists()) {
-                dfaSchema.createNewFile();
-            }
-            PrintWriter pw = new PrintWriter(dfaSchema);
-
-            pw.close();
- */
