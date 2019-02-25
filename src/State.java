@@ -8,9 +8,14 @@ public class State {
     private HashSet<String> name;
     private Hashtable<String, HashSet<String>> transition_function;
 
-    public State(HashSet<String> name){
+    public State(HashSet<String> name, HashSet<String> language){
         this.name = new HashSet<String>(name);
         this.transition_function = new Hashtable<String, HashSet<String>>();
+        for(String i : language)
+        {
+            transition_function.put(i, new HashSet<>());
+            transition_function.get(i).add("EM");
+        }
     }
 
     public void addTransition(String input, HashSet<String> nextState)
@@ -21,7 +26,6 @@ public class State {
     public HashSet<String> getName() {
         return name;
     }
-
 
     public HashSet<String> getEPSvalues()
     {

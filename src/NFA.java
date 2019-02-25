@@ -33,4 +33,45 @@ public class NFA {
 
     }
 
+    public DFA toDFA(){
+        Hashtable<HashSet<String>, Hashtable<String, HashSet<String>>> finalStates = new Hashtable<>();
+        DFA outputDFA = new DFA();
+
+        HashSet<String> tempName;
+        HashSet<String> tempTransitions;
+        Hashtable<String, HashSet<String>> tempTransitionFunction = new Hashtable<>();
+        for(String i : input_symbols )
+        {
+            tempTransitionFunction.put(i,null);
+        }
+
+        tempName = new HashSet<>(epsilonClosure(input_states.get(input_start_state)));
+
+        // For each state in start state
+        for(String i : tempName)
+        {
+            // For each symbol in the language
+            for(String j : input_symbols)
+            {
+                //Reinitialize temporary transition list
+                tempTransitions = new HashSet<>();
+                // For each transition from that symbol
+                for(String k : input_states.get(i).getTransitions(j))
+                {
+                    tempTransitions.addAll(epsilonClosure(input_states.get(k)));
+                }
+                tempTransitionFunction.put(j,tempTransitions);
+
+
+            }
+        }
+
+        finalStates.put(tempName,tempTransitionFunction);
+
+
+
+
+        return outputDFA;
+    }
+
 }
