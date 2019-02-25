@@ -1,8 +1,5 @@
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Hashtable;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -13,24 +10,26 @@ import java.util.regex.Pattern;
 
 public class Nfa_Scanner {
     private String filename;
-    private HashSet<String> states;
+    private HashSet<String> input_states;
     private HashSet<String> symbols;
     private String start_state;
     private HashSet<String> accept_states;
-    private HashSet<String> trans_function;
-    private Hashtable<String, State> nfaStateTable;
+    private HashSet<String> trans_strings;
+    private HashMap<String,State> outputStates;
+
 
 
     //Initializes object variables
     public Nfa_Scanner(String filename)
     {
-            this.nfaStateTable = new Hashtable<>();
-            this.states = new HashSet<String>();
-            this.symbols = new HashSet<>();
-            this.accept_states = new HashSet<>();
-            this.trans_function = new HashSet<>();
-            this.start_state = null;
+            input_states = new HashSet<>();
+            symbols = new HashSet<>();
+            accept_states = new HashSet<>();
+            trans_strings = new HashSet<>();
+            start_state = null;
+            outputStates = new HashMap<>();
             this.filename = filename;
+
     }
 
     /*
@@ -52,12 +51,13 @@ public class Nfa_Scanner {
             line = in.readLine();
             m = p.matcher(line);
             while (m.find()) {
-                states.add(m.group(1));
+                input_states.add(m.group(1));
             }
 
-            // Get symbols
+            // Create language
             line = in.readLine();
             symbols = new HashSet<String>(Arrays.asList(line.split("\\s+")));
+
 
             // Get start state
             line = in.readLine();
@@ -65,6 +65,7 @@ public class Nfa_Scanner {
             if(m.find())
             {
                 start_state = m.group(1);
+                start_state = start_state.replaceAll("\\s","");
             }
 
             //Get accept states
@@ -77,7 +78,7 @@ public class Nfa_Scanner {
             // Read transition function
             while((line = in.readLine()) != null)
             {
-                trans_function.add(line);
+                trans_strings.add(line);
                 //pw.println(line);
 
             }
@@ -91,12 +92,81 @@ public class Nfa_Scanner {
 
     }
 
-    public void printAll()
+    public boolean generateStates()
+    {
+        State tempState;
+        Pattern p = Pattern.compile("\\{([^}]*)\\}");
+        Pattern q = Pattern.compile(",\\s(.*)=");
+
+        for (String i : input_states)
+        {
+            HashSet<String> tempName = new HashSet<>();
+            tempName.add(i);
+            if(i.equals(start_state))
+            {
+                tempState = new State(tempName,symbols,true,true);
+            }
+            else
+            {
+                tempState = new State(tempName,symbols,false,true);
+            }
+            outputStates.put(tempState.toString(),tempState);
+        }
+
+        for (String j : trans_strings)
+        {
+            HashSet<String> state_name_set = new HashSet<>();
+            String state = new String();
+            String input = new String();
+            String dest = new String();
+            Matcher m = p.matcher(j);
+            Matcher n = q.matcher(j);
+            if (m.find())
+            {
+                state = m.group(1);
+            }
+            if (n.find())
+            {
+                input = n.group(1);
+            }
+            if (m.find())
+            {
+                dest = m.group(1);
+            }
+            outputStates.get(state).addTransition(input,dest);
+        }
+
+        printOutputStates();
+
+        return true;
+    }
+
+    public HashSet<String> getInputStates(){
+        return input_states;
+    }
+
+    public HashSet<String> getAcceptStates() {
+        return accept_states;
+    }
+
+    public HashSet<String> getSymbols() {
+        return symbols;
+    }
+
+    public HashSet<String> getTransFunction() {
+        return trans_strings;
+    }
+
+    public String getStartState() {
+        return start_state;
+    }
+
+    public void printNFASchema()
     {
         System.out.println("NFA schema: ");
         System.out.println("---------------------------------------");
         System.out.println("States: ");
-        for(String i : states)
+        for(String i : input_states)
         {
             System.out.print(i);
         }
@@ -117,7 +187,7 @@ public class Nfa_Scanner {
         System.out.print("\n");
 
         System.out.println("Transition Function: ");
-        for(String i : trans_function)
+        for(String i : trans_strings)
         {
             System.out.println(i);
         }
@@ -126,23 +196,13 @@ public class Nfa_Scanner {
 
     }
 
-    public HashSet<String> getStates(){
-        return states;
-    }
-
-    public HashSet<String> getAccept_states() {
-        return accept_states;
-    }
-
-    public HashSet<String> getSymbols() {
-        return symbols;
-    }
-
-    public HashSet<String> getTrans_function() {
-        return trans_function;
-    }
-
-    public String getStart_state() {
-        return start_state;
+    public void printOutputStates()
+    {
+        Set<String> keys = outputStates.keySet();
+        for(String k : keys)
+        {
+            outputStates.get(k).printTransitions();
+        }
     }
 }
+
