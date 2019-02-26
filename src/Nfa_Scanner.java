@@ -15,7 +15,7 @@ public class Nfa_Scanner {
     private String start_state;
     private HashSet<String> accept_states;
     private HashSet<String> trans_strings;
-    private HashMap<String,State> outputStates;
+    private HashMap<String,State> output_state_table;
 
 
 
@@ -27,9 +27,8 @@ public class Nfa_Scanner {
             accept_states = new HashSet<>();
             trans_strings = new HashSet<>();
             start_state = null;
-            outputStates = new HashMap<>();
+            output_state_table = new HashMap<>();
             this.filename = filename;
-
     }
 
     /*
@@ -110,12 +109,11 @@ public class Nfa_Scanner {
             {
                 tempState = new State(tempName,symbols,false,true);
             }
-            outputStates.put(tempState.toString(),tempState);
+            output_state_table.put(tempState.toString(),tempState);
         }
 
         for (String j : trans_strings)
         {
-            HashSet<String> state_name_set = new HashSet<>();
             String state = new String();
             String input = new String();
             String dest = new String();
@@ -133,11 +131,8 @@ public class Nfa_Scanner {
             {
                 dest = m.group(1);
             }
-            outputStates.get(state).addTransition(input,dest);
+            output_state_table.get(state).addTransition(input,dest);
         }
-
-        printOutputStates();
-
         return true;
     }
 
@@ -149,7 +144,11 @@ public class Nfa_Scanner {
         return accept_states;
     }
 
-    public HashSet<String> getSymbols() {
+    public HashSet<String> getSymbols(boolean remove_eps) {
+        if(remove_eps && symbols.contains("EPS"))
+        {
+            symbols.remove("EPS");
+        }
         return symbols;
     }
 
@@ -160,6 +159,12 @@ public class Nfa_Scanner {
     public String getStartState() {
         return start_state;
     }
+
+    public HashMap<String, State> getOutputStates()
+    {
+        return output_state_table;
+    }
+
 
     public void printNFASchema()
     {
@@ -198,11 +203,14 @@ public class Nfa_Scanner {
 
     public void printOutputStates()
     {
-        Set<String> keys = outputStates.keySet();
+        Set<String> keys = output_state_table.keySet();
+        System.out.println("--------------------------------------");
         for(String k : keys)
         {
-            outputStates.get(k).printTransitions();
+            output_state_table.get(k).printTransitions();
+            System.out.println("--------------------------------------");
         }
+
     }
 }
 

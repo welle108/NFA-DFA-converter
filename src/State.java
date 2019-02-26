@@ -103,7 +103,9 @@ public class State {
     public void printTransitions()
     {
         System.out.println("State: " + toString());
+        System.out.println("--------------------------------------");
         System.out.println("Transitions");
+        System.out.println("-------------");
         Set<String> tranSet = transition_function.keySet();
         for (String i : tranSet) {
             System.out.println("Input: " + i);

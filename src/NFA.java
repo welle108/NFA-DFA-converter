@@ -1,29 +1,85 @@
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Hashtable;
+
 
 public class NFA {
-    private HashSet<State> input_states;
+    private HashMap<String, State> input_states;
+    private HashSet<HashSet<String>> dfa_state_list;
+    private HashSet<State> dfa_output_states;
+    private HashSet<String> language;
+    private State start_state;
 
-    public NFA(HashSet<State> inputStates) {
+    public NFA(HashMap<String, State> input_states, HashSet<String> language, String nfa_start_state, HashSet<String> nfa_accept_states)
+    {
+        dfa_output_states = new HashSet<>();
+        dfa_state_list = new HashSet<>();
+        this.input_states = new HashMap<String, State>(input_states);
+        this.language = new HashSet<>(language);
+        HashSet<String> start_state_name = new HashSet<>(epsilonClosure(input_states.get(nfa_start_state)));
+        start_state = new State(start_state_name,language,true,false);
+        dfa_output_states.add(start_state);
+        dfa_state_list.add(start_state_name);
 
     }
 
-
     public HashSet<String> epsilonClosure(State inputState) {
         HashSet<String> outputClosure = new HashSet<String>(inputState.getName());
-        HashSet<String> epsTransitions = new HashSet<String>(inputState.getEPSvalues());
+        HashSet<String> epsTransitions = new HashSet<String>(inputState.getTransitions("EPS"));
 
-        while(!outputClosure.equals(epsTransitions)){
-            for(String i : epsTransitions){
-               // epsTransitions.addAll(input_states.get(i).getEPSvalues());
+        while(!outputClosure.equals(epsTransitions))
+        {
+
+            for(String i : epsTransitions)
+            {
+               epsTransitions.addAll(input_states.get(i).getEPSvalues());
             }
             outputClosure.addAll(epsTransitions);
         }
 
         return outputClosure;
-
     }
+
+    public boolean convertToDFA()
+    {
+        while(true)
+        {
+            State tempState;
+            HashSet<String> temp_state_name = new HashSet<>();
+            for(State s : dfa_output_states)
+            {
+                for(String i : s.getName())
+                {
+                    for(String j : language)
+                    {
+                        for(String k : input_states.get(i).getTransitions(j))
+                        {
+                            if(!input_states.get(k).getTransitions(j).contains("EM"))
+                            {
+                                temp_state_name.addAll(input_states.get(k).getTransitions("EPS"));
+                            }
+                        }
+
+                    }
+                }
+            }
+            break;
+        }
+        return true;
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     /*
     public DFA toDFA(){

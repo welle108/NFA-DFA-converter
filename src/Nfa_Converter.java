@@ -9,9 +9,11 @@ public class Nfa_Converter {
     public static void main(String[] args) {
 
         if(args.length > 0) {
+            NFA inputNFA;
             Nfa_Scanner mScan = new Nfa_Scanner(args[0]);
             mScan.Scan();
             mScan.generateStates();
+            inputNFA = new NFA(mScan.getOutputStates(),mScan.getSymbols(true),mScan.getStartState(),mScan.getAcceptStates());
         }
         else
         {
