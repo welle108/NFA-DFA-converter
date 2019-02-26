@@ -10,16 +10,20 @@ public class Nfa_Scanner {
     private String filename;
     private String start_state;
     private HashSet<String> symbols;
+    private HashSet<String> nfa_symbols;
     private HashSet<String> input_states;
     private HashSet<String> accept_states;
     private HashSet<String> trans_strings;
     private HashMap<String,State> output_state_table;
+    private HashMap<String,HashSet<String>> epsilon_closures;
 
     //Initializes object variables
     public Nfa_Scanner(String filename)
     {
+            epsilon_closures = new HashMap<>();
             input_states = new HashSet<>();
             symbols = new HashSet<>();
+            nfa_symbols = new HashSet<>();
             accept_states = new HashSet<>();
             trans_strings = new HashSet<>();
             start_state = null;
@@ -52,6 +56,7 @@ public class Nfa_Scanner {
             // Create language
             line = in.readLine();
             symbols = new HashSet<String>(Arrays.asList(line.split("\\s+")));
+            symbols.add("EPS");
 
 
             // Get start state
@@ -85,6 +90,7 @@ public class Nfa_Scanner {
             e.printStackTrace();
             System.exit(1);
         }
+
 
     }
 
@@ -132,11 +138,13 @@ public class Nfa_Scanner {
             output_state_table.get(state).addTransition(input,dest);
         }
 
+
         Set<String> keys = output_state_table.keySet();
-        for (String k : keys)
+        for(String key: keys)
         {
-            output_state_table.get(k).setEpsilonClosure(epsilonClosure(output_state_table.get(k)));
+            output_state_table.get(key).setEpsilonClosure(epsilonClosure(output_state_table.get(key)));
         }
+
         return true;
     }
 
@@ -145,12 +153,12 @@ public class Nfa_Scanner {
         HashSet<String> epsTransitions = new HashSet<String>(inputState.getTransitions("EPS"));
         while(!outputClosure.equals(epsTransitions))
         {
-
             for(String i : epsTransitions)
             {
                 epsTransitions.addAll(output_state_table.get(i).getTransitions("EPS"));
             }
             outputClosure.addAll(epsTransitions);
+            inputState.setEpsilonClosure(outputClosure);
         }
 
         return outputClosure;
@@ -164,12 +172,16 @@ public class Nfa_Scanner {
         return accept_states;
     }
 
-    public HashSet<String> getSymbols(boolean remove_eps) {
-        if(remove_eps && symbols.contains("EPS"))
-        {
-            symbols.remove("EPS");
-        }
+    public HashSet<String> getSymbols(boolean remove_eps)
+    {
         return symbols;
+    }
+
+    public HashSet<String> getDFASymbols()
+    {
+        HashSet<String> outputSymbols = new HashSet<>(symbols);
+            outputSymbols.remove("EPS");
+        return outputSymbols;
     }
 
     public HashSet<String> getTransFunction() {
@@ -218,6 +230,8 @@ public class Nfa_Scanner {
         }
         System.out.print("\n");
         System.out.println("---------------------------------------");
+
+
 
     }
 

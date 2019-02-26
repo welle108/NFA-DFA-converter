@@ -1,7 +1,7 @@
  /*
     Public main class which performs macro instructions using class objects
     NFA is input through Nfa_Scanner object which parses and sends data to Converter object
-    which facilitates NFA-DFA conversion
+    which facilitates NFA conversion
 */
 
 public class Nfa_Converter {
@@ -13,18 +13,16 @@ public class Nfa_Converter {
             Nfa_Scanner mScan = new Nfa_Scanner(args[0]);
             mScan.Scan();
             mScan.generateStates();
-            inputNFA = new NFA(mScan.getOutputStates(),mScan.getSymbols(true),mScan.getStartState(),mScan.getAcceptStates());
-            //inputNFA.convertToDFA();
+            inputNFA = new NFA(mScan.getOutputStates(),mScan.getDFASymbols(),mScan.getStartState(),mScan.getAcceptStates());
+            inputNFA.convertToDFA();
+            inputNFA.exportResults();
+
         }
         else
         {
             System.err.println("Invalid arg count: "+args.length);
             System.exit(1);
         }
-
-
-
-
 
     }
 }

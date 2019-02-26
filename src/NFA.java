@@ -1,128 +1,249 @@
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Set;
 
 
 public class NFA {
     private HashMap<String, State> input_states;
+    private HashSet<HashSet<String>> dfa_check_list;
     private HashSet<HashSet<String>> dfa_state_list;
     private HashSet<String> nfa_accept_states;
-    private HashSet<HashSet<String>> dfa_accept_states;
+    private HashSet<State> dfa_accept_states;
     private HashSet<State> dfa_output_states;
     private HashSet<String> language;
     private State start_state;
 
     public NFA(HashMap<String, State> input_states, HashSet<String> language, String nfa_start_state, HashSet<String> nfa_accept_states)
     {
+        dfa_accept_states = new HashSet<>();
         dfa_output_states = new HashSet<>();
         dfa_state_list = new HashSet<>();
         this.input_states = new HashMap<String, State>(input_states);
         this.language = new HashSet<>(language);
-        start_state = new State(input_states.get(nfa_start_state).getEspilonClosure(),language,true,false);
-        System.out.println("Start State for DFA: ");
-        start_state.printTransitions();
-        /*
-        HashSet<String> start_state_name = new HashSet<>(epsilonClosure(input_states.get(nfa_start_state)));
-        start_state = new State(start_state_name,language,true,false);
+        this.nfa_accept_states = new HashSet<>(nfa_accept_states);
+        start_state = new State(input_states.get(nfa_start_state).getEpsilonClosure(), language, true, false);
+
+
+        HashSet<String> temp_set = new HashSet<>();
+        for(String state : start_state.getName())
+        {
+            temp_set.add(state);
+        }
         dfa_output_states.add(start_state);
-        dfa_state_list.add(start_state_name);
-        */
+        dfa_state_list.add(start_state.getName());
+        for(String s : start_state.getName())
+        {
+            for(String l : language)
+            {
+                HashSet<String> temp_trans = new HashSet<>(input_states.get(s).getTransitions(l));
 
-    }
-
-
-    public boolean convertToDFA() {
-        boolean running = true;
-        System.out.println("Entered DFA conversion method");
-        while(running) {
-            State temp_state;
-            for(State s : dfa_output_states) {
-                System.out.println("Working on state: "+s.toString());
-
-                for(String i : s.getName()) {
-
-                    for(String j : language) {
-
-                        HashSet<String> temp_transition_function = new HashSet<>();
-                        System.out.println("Input is: "+j);
-
-                        if(!input_states.get(i).getTransitions(j).contains("EM")) {
-
-                             for(String k : input_states.get(i).getTransitions(j)){
-                                temp_transition_function.addAll(input_states.get(k).getEspilonClosure());
-                             }
-                        }
-                        for(String temp_func : temp_transition_function) {
-                            s.addTransition(j,temp_func);
-                        }
-                        if(!dfa_state_list.contains(s.getTransitions(j)))
-                        {
-                            temp_state = new State(s.getTransitions(j),language,false,false);
-                            dfa_output_states.add(temp_state);
-                        }
+                if(!temp_trans.contains("EM"))
+                {
+                    start_state.addAllTransitions(l, temp_trans);
+                }
+                for(String accept_states: nfa_accept_states)
+                {
+                    if(start_state.getName().contains(accept_states))
+                    {
+                        start_state.setIsAcceptState(true);
                     }
                 }
-                s.printTransitions();
+            }
+        }
+
+    start_state.printTransitions();
+    }
+
+    public boolean convertToDFA()
+    {
+        HashSet<State> temp_state_set = new HashSet<>();
+        HashSet<HashSet<String>> temp_star_trans = new HashSet<>();
+        boolean running = true;
+        while(running)
+        {
+            dfa_check_list = new HashSet<>(dfa_state_list);
+            State temp_state;
+
+            for(State s : dfa_output_states) {
+                for (String i : s.getName()) {
+                    for(String l : language)
+                    {
+                        HashSet<String> temp_trans = new HashSet<>(input_states.get(i).getTransitions(l));
+
+                        if(temp_trans.contains("EM"))
+                        {
+                            continue;
+                        }
+                        for(String string : input_states.get(i).getTransitions("EPS"))
+                        {
+                            temp_trans.add(string);
+                        }
+                        if(!dfa_state_list.contains(temp_trans))
+                        {
+                            dfa_check_list.add(temp_trans);
+                            temp_state = new State(temp_trans,language,false,false);
+                            temp_state_set.add(temp_state);
+                            for(String accept_states: nfa_accept_states)
+                            {
+                                if(temp_state.getName().contains(accept_states))
+                                {
+                                    temp_state.setIsAcceptState(true);
+                                }
+                            }
+                        }
+                        s.addAllTransitions(l, temp_trans);
+
+                    }
+                }
+
             }
 
+            if(dfa_state_list.equals(dfa_check_list))
+            {
+                break;
+            }
+
+
+            dfa_state_list.addAll(dfa_check_list);
+            dfa_output_states.addAll(temp_state_set);
+
+                setAcceptStates();
+                printAllDFAStates();
 
         }
         return true;
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    /*
-    public DFA toDFA(){
-        Hashtable<HashSet<String>, Hashtable<String, HashSet<String>>> finalStates = new Hashtable<>();
-        DFA outputDFA = new DFA();
-
-        HashSet<String> tempName;
-        HashSet<String> tempTransitions;
-        Hashtable<String, HashSet<String>> tempTransitionFunction = new Hashtable<>();
-        for(String i : input_symbols )
+    private void setAcceptStates()
+    {
+        for(State s : dfa_output_states)
         {
-            tempTransitionFunction.put(i,null);
-        }
-
-        tempName = new HashSet<>(epsilonClosure(input_states.get(input_start_state)));
-
-        // For each state in start state
-        for(String i : tempName)
-        {
-            // For each symbol in the language
-            for(String j : input_symbols)
+            for(String i : nfa_accept_states)
             {
-                //Reinitialize temporary transition list
-                tempTransitions = new HashSet<>();
-                // For each transition from that symbol
-                for(String k : input_states.get(i).getTransitions(j))
+                if(s.getName().contains(i))
                 {
-                    tempTransitions.addAll(epsilonClosure(input_states.get(k)));
+                    s.setIsAcceptState(true);
+                    dfa_accept_states.add(s);
                 }
-                tempTransitionFunction.put(j,tempTransitions);
+            }
 
+        }
+    }
+
+    public HashSet<State> getDFAAcceptStates()
+    {
+        return dfa_accept_states;
+    }
+
+    public HashSet<State> getAllDFAStates()
+    {
+        return dfa_output_states;
+    }
+
+    public State getStartState()
+    {
+        return start_state;
+    }
+
+    public HashSet<String> getLanguage()
+    {
+        return language;
+    }
+
+    public boolean exportResults()
+    {
+        File outputFile = new File("output.dfa");
+        try {
+            outputFile.createNewFile();
+            FileWriter fw = new FileWriter((outputFile.getAbsoluteFile()));
+            BufferedWriter bw = new BufferedWriter(fw);
+            String line = new String();
+            //Write States
+            for(State s : dfa_output_states)
+            {
+                line+=s.getStateStringName();
+                line+="\t";
 
             }
+            System.out.println(line);
+            bw.write(line);
+            bw.write("\n");
+
+            //Write Language
+            line = new String();
+            for(String i : language)
+            {
+                line += i;
+                line += "\t";
+            }
+            System.out.println(line);
+            bw.write(line);
+            bw.write("\n");
+            //Start State
+            line = new String(start_state.getStateStringName());
+            bw.write(line);
+            bw.write("\n");
+            System.out.println(line);
+
+            //Accept State
+            line = new String();
+            for(State s : dfa_output_states)
+            {
+                if(s.getIsAcceptState())
+                {
+                    line+=s.getStateStringName();
+                    line+="\t";
+                }
+            }
+            System.out.println(line);
+            bw.write(line);
+            bw.write("\n");
+            //Transition Function
+            line = new String();
+            for(State s : dfa_output_states)
+            {
+                for(String l : language)
+                {
+                    line = s.getStateStringName()+", "+l+" = ";
+                    String dest = new String();
+                    dest+="{";
+                    for(String i : s.getTransitions(l))
+                    {
+                        dest+=i;
+                        dest+=",";
+                    }
+                    dest = dest.substring(0,dest.length()-1);
+                    dest+="}";
+                    line+=dest;
+                    System.out.println(line);
+                    bw.write(line);
+                    bw.write("\n");
+
+                }
+            }
+            bw.close();
+            fw.close();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
-        finalStates.put(tempName,tempTransitionFunction);
+        return true;
 
-
-
-
-        return outputDFA;
     }
-*/
+
+    public boolean printAllDFAStates()
+    {
+        for(State s : dfa_output_states)
+        {
+            s.printTransitions();
+            System.out.println();
+        }
+
+        return true;
+    }
+
+
 }
