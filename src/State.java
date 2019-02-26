@@ -6,13 +6,14 @@ public class State {
     private boolean is_start_state;
     private HashSet<String> name;
     private HashSet<String> language;
+    private HashSet<String> epsilon_closure;
     private HashMap<String, HashSet<String>> transition_function;
 
-    public State()
-    {
-        this.is_start_state=false;
+    public State() {
+        is_start_state=false;
         name = null;
         language = null;
+        epsilon_closure = null;
         transition_function = null;
     }
 
@@ -20,59 +21,54 @@ public class State {
     public State(HashSet<String> name, HashSet<String> symbols, boolean isStart, boolean isNFA){
         this.name = new HashSet<>(name);
         this.transition_function = new HashMap<>();
-        if(isNFA)
-        {
+        if(isNFA) {
             symbols.add("EPS");
         }
-        for(String i : symbols)
-        {
+        for(String i : symbols) {
             transition_function.put(i, new HashSet<>());
-
-            if(i.equals("EPS"))
-            {
+            if(i.equals("EPS")) {
                 transition_function.get(i).add(this.toString());
             }
-            else
-            {
+            else{
                 transition_function.get(i).add("EM");
             }
         }
         this.is_start_state = isStart;
+        epsilon_closure = null;
     }
 
 
-    public void addTransition(String input, String nextState)
-    {
+    public void addTransition(String input, String nextState) {
         input = input.replaceAll("\\s","");
-    if(transition_function.containsKey(input))
-        {
+    if(transition_function.containsKey(input)) {
             try {
-                if (transition_function.get(input).contains("EM")) ;
-                {
+                if (transition_function.get(input).contains("EM")) ;{
                     transition_function.get(input).remove("EM");
                 }
                 transition_function.get(input).add(nextState);
-            } catch (Exception e) {
+            } catch (Exception e){
                 e.printStackTrace();
             }
         }
     }
 
-    public boolean setName(HashSet<String> name)
-    {
+    public boolean setName(HashSet<String> name) {
         this.name = new HashSet<>(name);
         return true;
     }
 
-    public boolean setLanguage(HashSet<String> language)
-    {
+    public boolean setLanguage(HashSet<String> language) {
         this.language = new HashSet<>(language);
         return true;
     }
 
-    public boolean setIsStartState(boolean isStart)
-    {
+    public boolean setIsStartState(boolean isStart) {
         this.is_start_state = isStart;
+        return true;
+    }
+
+    public boolean setEpsilonClosure(HashSet<String> inputClosure){
+        epsilon_closure = new HashSet<>(inputClosure);
         return true;
     }
 
@@ -80,16 +76,13 @@ public class State {
         return name;
     }
 
-
-    public HashSet<String> getEPSvalues()
-    {
-        return transition_function.get("EPS");
-    }
-
     public HashSet<String> getTransitions(String input)
     {
         return transition_function.get(input);
     }
+
+    public HashSet<String> getEspilonClosure(){ return epsilon_closure; }
+
 
     public String toString(){
         String name = new String();
@@ -116,7 +109,6 @@ public class State {
         if (is_start_state) {
             System.out.println("Is Start State");
         }
-
     }
 
     public String stringOfName(){

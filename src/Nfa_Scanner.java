@@ -2,22 +2,18 @@ import java.io.*;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
     /*
     Public class for Scanning .nfa files and delivering the NFA schema to
     an Nfa_Converter object in the form of ArrayList<String>'s and Strings.
      */
-
 public class Nfa_Scanner {
     private String filename;
-    private HashSet<String> input_states;
-    private HashSet<String> symbols;
     private String start_state;
+    private HashSet<String> symbols;
+    private HashSet<String> input_states;
     private HashSet<String> accept_states;
     private HashSet<String> trans_strings;
     private HashMap<String,State> output_state_table;
-
-
 
     //Initializes object variables
     public Nfa_Scanner(String filename)
@@ -83,7 +79,8 @@ public class Nfa_Scanner {
             }
             in.close();
 
-        }catch (IOException e){
+        }catch (IOException e)
+        {
             System.out.println("Error opening file");
             e.printStackTrace();
             System.exit(1);
@@ -131,9 +128,32 @@ public class Nfa_Scanner {
             {
                 dest = m.group(1);
             }
+
             output_state_table.get(state).addTransition(input,dest);
         }
+
+        Set<String> keys = output_state_table.keySet();
+        for (String k : keys)
+        {
+            output_state_table.get(k).setEpsilonClosure(epsilonClosure(output_state_table.get(k)));
+        }
         return true;
+    }
+
+    public HashSet<String> epsilonClosure(State inputState) {
+        HashSet<String> outputClosure = new HashSet<String>(inputState.getName());
+        HashSet<String> epsTransitions = new HashSet<String>(inputState.getTransitions("EPS"));
+        while(!outputClosure.equals(epsTransitions))
+        {
+
+            for(String i : epsTransitions)
+            {
+                epsTransitions.addAll(output_state_table.get(i).getTransitions("EPS"));
+            }
+            outputClosure.addAll(epsTransitions);
+        }
+
+        return outputClosure;
     }
 
     public HashSet<String> getInputStates(){

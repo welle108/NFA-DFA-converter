@@ -14,6 +14,7 @@ public class Nfa_Converter {
             mScan.Scan();
             mScan.generateStates();
             inputNFA = new NFA(mScan.getOutputStates(),mScan.getSymbols(true),mScan.getStartState(),mScan.getAcceptStates());
+            //inputNFA.convertToDFA();
         }
         else
         {
